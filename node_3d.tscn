@@ -1,0 +1,97 @@
+[gd_scene load_steps=8 format=3 uid="uid://dj0xeqrewbqua"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_popsf"]
+[ext_resource type="FontFile" uid="uid://cuvaxgq1bxcw4" path="res://OpenSans-VariableFont_wdth,wght.ttf" id="2_rarv4"]
+[ext_resource type="PackedScene" uid="uid://bxhwcoimya1tu" path="res://miku.glb" id="3_50qcl"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l3dh4"]
+bg_color = Color(0, 1, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xma4c"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5spa0"]
+bg_color = Color(1, 0.392855, 0.324508, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cfum0"]
+bg_color = Color(1, 1, 1, 1)
+
+[node name="Node3D" type="Node3D" node_paths=PackedStringArray("calibration_ui", "camera")]
+script = ExtResource("1_popsf")
+calibration_ui = NodePath("Calibration")
+camera = NodePath("Camera3D")
+
+[node name="Calibration" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StartLine" type="Panel" parent="Calibration"]
+z_index = 100
+layout_mode = 1
+anchors_preset = -1
+anchor_bottom = 1.0
+offset_left = 100.0
+offset_right = 101.0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_l3dh4")
+
+[node name="Panel" type="Panel" parent="Calibration"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_xma4c")
+
+[node name="Label" type="Label" parent="Calibration"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.699
+anchor_top = 0.085
+anchor_right = 0.913
+anchor_bottom = 0.385
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_rarv4")
+theme_override_font_sizes/font_size = 25
+text = "Place ruler along 
+white line.
+Start from 
+green line
+until red line.
+"
+
+[node name="EndLine" type="Panel" parent="Calibration"]
+z_index = 100
+layout_mode = 1
+anchors_preset = -1
+anchor_bottom = 1.0
+offset_left = 600.0
+offset_right = 601.0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_5spa0")
+
+[node name="HorizontalLine" type="Panel" parent="Calibration"]
+z_index = 100
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_bottom = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cfum0")
+
+[node name="miku" parent="." instance=ExtResource("3_50qcl")]
+transform = Transform3D(-1.20094e-07, 0, 2.74744, 0, 2.74744, 0, -2.74744, 0, -1.20094e-07, 0, -0.427379, -0.0307077)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
