@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://dj0xeqrewbqua"]
+[gd_scene load_steps=12 format=3 uid="uid://dj0xeqrewbqua"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_popsf"]
 [ext_resource type="FontFile" uid="uid://cuvaxgq1bxcw4" path="res://OpenSans-VariableFont_wdth,wght.ttf" id="2_rarv4"]
@@ -16,10 +16,29 @@ bg_color = Color(1, 0.392855, 0.324508, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cfum0"]
 bg_color = Color(1, 1, 1, 1)
 
-[node name="Node3D" type="Node3D" node_paths=PackedStringArray("calibration_ui", "camera")]
+[sub_resource type="PlaneMesh" id="PlaneMesh_dcsie"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_gfqy5"]
+sun_angle_max = 32.1
+sun_curve = 0.0832178
+energy_multiplier = 1.55
+
+[sub_resource type="Sky" id="Sky_5fd8a"]
+sky_material = SubResource("ProceduralSkyMaterial_gfqy5")
+
+[sub_resource type="Environment" id="Environment_lhpsi"]
+background_mode = 2
+sky = SubResource("Sky_5fd8a")
+sky_custom_fov = 74.1
+ambient_light_source = 3
+ambient_light_color = Color(0.986524, 0.953838, 0.979893, 1)
+ambient_light_energy = 0.0
+
+[node name="Node3D" type="Node3D" node_paths=PackedStringArray("calibration_ui", "left_cameras", "right_cameras")]
 script = ExtResource("1_popsf")
 calibration_ui = NodePath("Calibration")
-camera = NodePath("Camera3D")
+left_cameras = NodePath("LeftCameras")
+right_cameras = NodePath("RightCameras")
 
 [node name="Calibration" type="Control" parent="."]
 visible = false
@@ -94,4 +113,29 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_cfum0")
 transform = Transform3D(-1.20094e-07, 0, 2.74744, 0, 2.74744, 0, -2.74744, 0, -1.20094e-07, 0, -0.427379, -0.0307077)
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+transform = Transform3D(0.00220529, 0.00132896, 0.999997, -0.0018617, 0.999997, -0.00132484, -0.999996, -0.00185876, 0.00220777, 1.16773, 0, -0.0184977)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(33.7475, 0, 0, 0, 0.997471, 0, 0, 0, 27.5859, 0, -0.397147, 0)
+mesh = SubResource("PlaneMesh_dcsie")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_lhpsi")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.60919, 1.00285, -0.662523)
+shadow_enabled = true
+
+[node name="LeftCameras" type="Node3D" parent="."]
+
+[node name="RightCameras" type="Node3D" parent="."]
+
+[node name="Viewports" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
