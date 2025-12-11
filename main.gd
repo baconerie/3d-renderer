@@ -76,6 +76,8 @@ func _process(delta: float) -> void:
 					#print('Received code 5.')
 					# Interlacing pattern
 					var is_left_eye: bool = conn.get_64() == 0
+
+					conn.poll()
 					var segment_width: int = conn.get_64()
 
 					#print('Is left eye: ' + str(is_left_eye))
@@ -84,7 +86,7 @@ func _process(delta: float) -> void:
 					var window_x: float = get_viewport().get_visible_rect().size.x
 					var window_y: float = get_viewport().get_visible_rect().size.y
 
-					var combined_fov = 2 * atan(tan(42.5) * (window_x / window_y))
+					var combined_fov = rad_to_deg(2 * atan(tan(deg_to_rad(42.5)) * (window_x / window_y)))
 
 					var angle_covered: float = 0.0
 					var pixels_covered: int = 0
@@ -97,10 +99,9 @@ func _process(delta: float) -> void:
 						right_cameras.remove_child(n)
 						n.queue_free()
 
+					print('\n\n\nNEW INTERLACING PATTERN RECEIVED')
 					while segment_width != -1:
 						#print('Line 87. Inside the while loop. Segment width: ' + str(segment_width))
-						conn.poll()
-						segment_width = conn.get_64()
 
 						var sub_viewport_container = SubViewportContainer.new()
 						var sub_viewport = SubViewport.new()
@@ -109,8 +110,18 @@ func _process(delta: float) -> void:
 						sub_viewport.add_child(camera)
 						sub_viewport_container.add_child(sub_viewport)
 
-						sub_viewport_container.size = Vector2(segment_width, window_y)
-						sub_viewport_container.position = Vector2(pixels_covered, 0)
+						sub_viewport.size = Vector2(segment_width, window_y)
+
+						sub_viewport_container.set_offset(Side.SIDE_LEFT, pixels_covered)
+						sub_viewport_container.set_offset(Side.SIDE_RIGHT, pixels_covered + segment_width)
+						sub_viewport_container.set_offset(Side.SIDE_TOP, 0)
+						sub_viewport_container.set_offset(Side.SIDE_BOTTOM, 0)
+
+						sub_viewport_container.set_anchor(Side.SIDE_LEFT, 0)
+						sub_viewport_container.set_anchor(Side.SIDE_RIGHT, 0)
+						sub_viewport_container.set_anchor(Side.SIDE_TOP, 0)
+						sub_viewport_container.set_anchor(Side.SIDE_BOTTOM, 1)
+						
 
 						if is_left_eye:
 							camera.position = left_cameras.position
@@ -124,19 +135,50 @@ func _process(delta: float) -> void:
 							right_cameras.add_child(sub_viewport_container)
 
 						var segment_fov = rad_to_deg(2 * atan(tan(deg_to_rad(42.5)) * (segment_width / window_y)))
-						camera.fov = segment_fov
+						#camera.fov = clamp(segment_fov, 1, 179)
+
+						# prints('Segment width: ' + str(segment_width),
+						# 	'is_left_eye: ' + str(is_left_eye),
+						# 	'Pixels covered: ' + str(pixels_covered),
+						# 	'Segment FOV: ' + str(segment_fov),
+						# 	'Sub viewport container size: ' + str(sub_viewport_container.size),
+						# 	'Sub viewport container position: ' + str(sub_viewport_container.position),
+						# 	'Sub viewport offset left: ' + str(sub_viewport_container.get_offset(Side.SIDE_LEFT)),
+						# 	'Sub viewport offset right: ' + str(sub_viewport_container.get_offset(Side.SIDE_RIGHT)),
+						# 	'Sub viewport offset top: ' + str(sub_viewport_container.get_offset(Side.SIDE_TOP)),
+						# 	'Sub viewport offset bottom: ' + str(sub_viewport_container.get_offset(Side.SIDE_BOTTOM)),
+						# 	'Sub viewport anchor left: ' + str(sub_viewport_container.get_anchor(Side.SIDE_LEFT)),
+						# 	'Sub viewport anchor right: ' + str(sub_viewport_container.get_anchor(Side.SIDE_RIGHT)),
+						# 	'Sub viewport anchor top: ' + str(sub_viewport_container.get_anchor(Side.SIDE_TOP)),
+						# 	'Sub viewport anchor bottom: ' + str(sub_viewport_container.get_anchor(Side.SIDE_BOTTOM)),
+						# 	'\n')
 
 						# Rotate the camera to the correct angle
 						camera.look_at(Vector3(0, 0, 0), Vector3.UP)
+
+						print('Camera FOV is set to ' + str(camera.fov))
+						print('segment fov is ' + str(segment_fov))
+						print('combined fov is ' + str(combined_fov))
+						print('is left eye = ' + str(is_left_eye))
+						print('Camera position is ' + str(camera.position))
+						print('Looked at origin. The rotation is now: ' + str(camera.rotation_degrees))
+						print('Going to rotate y by angle ' + str(angle_covered + segment_fov / 2 - (combined_fov / 2)))
+
 						camera.rotate_y(deg_to_rad(angle_covered + segment_fov / 2 - (combined_fov / 2)))
+
+						print('After rotating, the rotation is now: ' + str(camera.rotation_degrees))
+						print('\n\n')
 
 						# Update angle covered
 						angle_covered += segment_fov
 						pixels_covered += segment_width
 						is_left_eye = not is_left_eye
+
+						conn.poll()
 						segment_width = conn.get_64()
-					
-			
+
+
+
 			#print('End of match statement')
 	
 	#print('End of process function\n\n\n')
