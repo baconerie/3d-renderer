@@ -56,9 +56,9 @@ func _process(delta: float) -> void:
 					#print('We\'ve put in the size of the window x: ' + str(get_viewport().get_visible_rect().size.x))
 				4:
 					# New eye angles, so move the camera
-					var left_eye_horizontal_angle: float = conn.get_double()
+					var left_eye_horizontal_angle: float = -conn.get_double()
 					var left_eye_vertical_angle: float = conn.get_double()
-					var right_eye_horizontal_angle: float = conn.get_double()
+					var right_eye_horizontal_angle: float = -conn.get_double()
 					var right_eye_vertical_angle: float = conn.get_double()
 					
 					var left_x = cos(deg_to_rad(left_eye_vertical_angle)) * cos(deg_to_rad(left_eye_horizontal_angle))
@@ -99,7 +99,7 @@ func _process(delta: float) -> void:
 						right_cameras.remove_child(n)
 						n.queue_free()
 
-					print('\n\n\nNEW INTERLACING PATTERN RECEIVED')
+					#print('\n\n\nNEW INTERLACING PATTERN RECEIVED')
 					while segment_width != -1:
 						#print('Line 87. Inside the while loop. Segment width: ' + str(segment_width))
 
@@ -163,9 +163,11 @@ func _process(delta: float) -> void:
 						print('Camera position is ' + str(camera.position))
 						print('Looked at origin. The rotation is now: ' + str(camera.rotation_degrees))
 						print('Going to rotate y by angle ' + str(angle_covered + segment_fov / 2 - (combined_fov / 2)))
+						print('Angled covered: ' + str(angle_covered))
 
 						camera.rotate_y(deg_to_rad(angle_covered + segment_fov / 2 - (combined_fov / 2)))
 
+						
 						print('After rotating, the rotation is now: ' + str(camera.rotation_degrees))
 						print('\n\n')
 
