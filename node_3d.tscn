@@ -1,20 +1,12 @@
-[gd_scene load_steps=12 format=3 uid="uid://dj0xeqrewbqua"]
+[gd_scene load_steps=16 format=3 uid="uid://dj0xeqrewbqua"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_popsf"]
 [ext_resource type="FontFile" uid="uid://cuvaxgq1bxcw4" path="res://OpenSans-VariableFont_wdth,wght.ttf" id="2_rarv4"]
 [ext_resource type="PackedScene" uid="uid://bxhwcoimya1tu" path="res://miku.glb" id="3_50qcl"]
+[ext_resource type="Shader" path="res://lenticular_bars.gdshader" id="4_6100t"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l3dh4"]
-bg_color = Color(0, 1, 0, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xma4c"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wxfd8"]
 bg_color = Color(0, 0, 0, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5spa0"]
-bg_color = Color(1, 0.392855, 0.324508, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cfum0"]
-bg_color = Color(1, 1, 1, 1)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_dcsie"]
 
@@ -34,11 +26,109 @@ ambient_light_source = 3
 ambient_light_color = Color(0.986524, 0.953838, 0.979893, 1)
 ambient_light_energy = 0.0
 
-[node name="Node3D" type="Node3D" node_paths=PackedStringArray("calibration_ui", "left_cameras", "right_cameras")]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ta6xa"]
+shader = ExtResource("4_6100t")
+shader_parameter/left_eye_angle_degrees = 0.0
+shader_parameter/right_eye_angle_degrees = 1.0
+shader_parameter/index_of_refraction = 1.5
+shader_parameter/pixels_per_lens = 10.0
+shader_parameter/for_left_eye = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0hfyi"]
+shader = ExtResource("4_6100t")
+shader_parameter/left_eye_angle_degrees = 0.0
+shader_parameter/right_eye_angle_degrees = 1.0
+shader_parameter/index_of_refraction = 1.5
+shader_parameter/pixels_per_lens = 10.0
+shader_parameter/for_left_eye = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l3dh4"]
+bg_color = Color(0, 1, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xma4c"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5spa0"]
+bg_color = Color(1, 0.392855, 0.324508, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cfum0"]
+bg_color = Color(1, 1, 1, 1)
+
+[node name="Node3D" type="Node3D" node_paths=PackedStringArray("calibration_ui", "left_cameras", "right_cameras", "left_viewport_container", "right_viewport_container")]
 script = ExtResource("1_popsf")
 calibration_ui = NodePath("Calibration")
-left_cameras = NodePath("LeftCameras")
-right_cameras = NodePath("RightCameras")
+left_cameras = NodePath("LeftViewportContainer/LeftViewport/LeftCamera")
+right_cameras = NodePath("RightViewportContainer/RightViewport/RightCamera")
+left_viewport_container = NodePath("LeftViewportContainer")
+right_viewport_container = NodePath("RightViewportContainer")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_wxfd8")
+
+[node name="miku" parent="." instance=ExtResource("3_50qcl")]
+transform = Transform3D(-1.20094e-07, 0, 2.74744, 0, 2.74744, 0, -2.74744, 0, -1.20094e-07, -0.363, -0.40942, 0.006)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(33.7475, 0, 0, 0, 0.997471, 0, 0, 0, 27.5859, 0, -0.397147, 0)
+mesh = SubResource("PlaneMesh_dcsie")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_lhpsi")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.60919, 1.00285, -0.662523)
+shadow_enabled = true
+
+[node name="Viewports" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="LeftViewportContainer" type="SubViewportContainer" parent="."]
+material = SubResource("ShaderMaterial_ta6xa")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 0
+stretch = true
+
+[node name="LeftViewport" type="SubViewport" parent="LeftViewportContainer"]
+handle_input_locally = false
+size = Vector2i(1152, 648)
+render_target_update_mode = 4
+
+[node name="LeftCamera" type="Camera3D" parent="LeftViewportContainer/LeftViewport"]
+transform = Transform3D(0.5865, 0, 0.80995, 0, 1, 0, -0.80995, 0, 0.5865, 0.523747, 0.232818, 0.764275)
+
+[node name="RightViewportContainer" type="SubViewportContainer" parent="."]
+material = SubResource("ShaderMaterial_0hfyi")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 0
+stretch = true
+
+[node name="RightViewport" type="SubViewport" parent="RightViewportContainer"]
+handle_input_locally = false
+size = Vector2i(1152, 648)
+render_target_update_mode = 4
+
+[node name="RightCamera" type="Camera3D" parent="RightViewportContainer/RightViewport"]
+transform = Transform3D(-0.165048, 0, 0.986286, 0, 1, 0, -0.986286, 0, -0.165048, 1.08552, 0.355515, -0.313007)
 
 [node name="Calibration" type="Control" parent="."]
 visible = false
@@ -108,31 +198,3 @@ offset_bottom = 10.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_cfum0")
-
-[node name="miku" parent="." instance=ExtResource("3_50qcl")]
-transform = Transform3D(-1.20094e-07, 0, 2.74744, 0, 2.74744, 0, -2.74744, 0, -1.20094e-07, -0.363, -0.272, 0.006)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(33.7475, 0, 0, 0, 0.997471, 0, 0, 0, 27.5859, 0, -0.397147, 0)
-mesh = SubResource("PlaneMesh_dcsie")
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_lhpsi")
-
-[node name="OmniLight3D" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.60919, 1.00285, -0.662523)
-shadow_enabled = true
-
-[node name="LeftCameras" type="Node3D" parent="."]
-
-[node name="RightCameras" type="Node3D" parent="."]
-
-[node name="Viewports" type="Control" parent="."]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
